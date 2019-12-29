@@ -1,0 +1,26 @@
+{
+  "name": "twitter-stuff",
+  "version": "0.0.1",
+  "description": "using Twitter API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kcivey/twitter-stuff.git"
+  },
+  "author": "Keith C. Ivey <keith@iveys.org>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kcivey/twitter-stuff/issues"
+  },
+  "homepage": "https://github.com/kcivey/twitter-stuff#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "twitter": "^1.7.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0"
+  }
+}
