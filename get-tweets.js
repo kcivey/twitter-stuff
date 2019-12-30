@@ -19,7 +19,7 @@ const argv = require('yargs')
             default: '1970-01-01',
             requiredArg: true,
             coerce(dateString) {
-                const m = moment(dateString, 'ddd MMM DD HH:mm:ss ZZ YYYY');
+                const m = moment(dateString);
                 assert(m.isValid(), 'Invalid date');
                 return m;
             },
@@ -27,6 +27,11 @@ const argv = require('yargs')
     })
     .strict(true)
     .argv;
+const client = new Twitter({
+    consumer_key: process.env.TWITTER_CONSUMER_KEY,
+    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+    bearer_token: process.env.TWITTER_BEARER_TOKEN,
+});
 
 main()
     .catch(function (err) {
@@ -35,27 +40,37 @@ main()
     });
 
 async function main() {
-    const client = new Twitter({
-        consumer_key: process.env.TWITTER_CONSUMER_KEY,
-        consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-        bearer_token: process.env.TWITTER_BEARER_TOKEN,
-    });
+    await getTweets('tweets');
+    await getTweets('favorites');
+}
+
+async function getTweets(type) {
     const allTweets = [];
+    let url;
     let maxId = null;
     const params = {
         screen_name: argv.user,
         count: 200,
         include_rts: 1,
     };
+    if (type === 'tweets') {
+        params.include_rts = 1;
+        url = 'statuses/user_timeline';
+    }
+    else {
+        params.include_entities = 0;
+        url = 'favorites/list';
+    }
+    console.warn(type);
     while (true) {
         console.warn(maxId);
         if (maxId) {
             params.max_id = maxId;
         }
-        const newTweets = await client.get('statuses/user_timeline', params);
+        const newTweets = await client.get(url, params);
         let newCount = 0;
         for (const tweet of newTweets) {
-            const tweetDate = moment(tweet.created_at);
+            const tweetDate = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss ZZ YYYY');
             if (tweetDate < argv.date) {
                 break;
             }
@@ -68,7 +83,7 @@ async function main() {
         maxId = (BigInt(newTweets[newTweets.length - 1].id_str) - BigInt(1)).toString();
         await pause(1000);
     }
-    const filename = __dirname + '/data/' + argv.user + '-tweets-' + argv.date.format('YYYYMMDD') + '.json';
+    const filename = `${__dirname}/data/${argv.user}-${type}-${argv.date.format('YYYYMMDD')}.json`;
     fs.writeFileSync(filename, JSON.stringify(allTweets, null, 2));
 }
 
