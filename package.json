@@ -19,7 +19,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "glob": "^7.1.6",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "request-promise-native": "^1.0.8",
     "sprintf-js": "^1.1.2",
     "twitter": "^1.7.1",
